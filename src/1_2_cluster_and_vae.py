@@ -4,10 +4,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# -------------------------------------------------------------------
-# Make imports work when running from src/ directly
-# Ensures project root is on sys.path
-# -------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -19,18 +15,14 @@ from torch.utils.data import DataLoader, TensorDataset
 from src.audio_vae import AudioVAE, vae_loss_function
 from src.cluster_visualize import cluster_kmeans, plot_tsne
 
-
-# =============================
 # HARD-CODED PATHS
-# =============================
 X_PATH = "data/audio_features_keptwhisper.npy"
 Z_OUT = "data/audio_latents_vae.npy"
 PLOT_OUT = "results/tsne_clusters.png"
 
-# =============================
+
 # TRAINING SETTINGS
-# =============================
-EPOCHS = 150
+EPOCHS = 500
 BATCH_SIZE = 64
 LR = 1e-3
 
@@ -53,20 +45,33 @@ def main():
         shuffle=True
     )
 
+    # ... inside main() ...
+
     for epoch in range(1, EPOCHS + 1):
-        epoch_loss = 0.0
+        total_loss = 0.0
+        total_recon = 0.0
+        total_kl = 0.0
+        
         for (xb,) in loader:
             xb = xb.to(device)
             recon, mu, logvar = vae(xb)
-            loss, _, _ = vae_loss_function(recon, xb, mu, logvar)
+            
+            # Assuming vae_loss_function returns (total, recon, kl)
+            # If it currently returns (loss, logs, etc), you might need to adjust this unpacking
+            loss, recon_loss, kl_loss = vae_loss_function(recon, xb, mu, logvar)
+            
             opt.zero_grad()
             loss.backward()
             opt.step()
-            epoch_loss += loss.item()
+            
+            total_loss += loss.item()
+            total_recon += recon_loss.item() # Track specifically
+            total_kl += kl_loss.item()       # Track specifically
 
         if epoch % 10 == 0:
-            print(f"Epoch {epoch}, Loss {epoch_loss/len(loader):.4f}")
-
+            avg_recon = total_recon / len(loader)
+            avg_kl = total_kl / len(loader)
+            print(f"Epoch {epoch} | Total: {total_loss/len(loader):.4f} | Recon: {avg_recon:.4f} | KL: {avg_kl:.4f}")
     # Latents (use mu as deterministic embedding)
     vae.eval()
     latent_vectors = []

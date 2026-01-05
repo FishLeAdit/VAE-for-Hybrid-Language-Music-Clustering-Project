@@ -104,7 +104,6 @@ def main():
     df["track_id"] = df["track_id"].astype(int)
 
     # Partial labels (genre) for ARI
-    # If you consider genre as “partial truth”, ARI is meaningful for analysis.
     genres = df["genre"].astype(str).to_numpy()
     genre_codes = pd.factorize(genres)[0]
 
@@ -112,7 +111,7 @@ def main():
 
     results = []
 
-    # ---------- Representation A: MFCC -> PCA(8) ----------
+    # Representation A: MFCC -> PCA(8) 
     X_mfcc = np.load(MFCC_X)
     if os.path.exists(MFCC_IDS):
         mfcc_ids = np.load(MFCC_IDS).astype(int)
@@ -127,14 +126,12 @@ def main():
     X_mfcc = StandardScaler().fit_transform(X_mfcc).astype(np.float32)
     X_pca = PCA(n_components=8, random_state=42).fit_transform(X_mfcc).astype(np.float32)
 
-    # ---------- Representation B: Dense VAE latents ----------
+    #  Representation B: Dense VAE latents 
     Z_dense = np.load(DENSE_Z).astype(np.float32)
-    # dense latents were computed for 4182 tracks; assume same ordering as mfcc aligned
-    # safest: reuse mfcc aligned length
     Z_dense = Z_dense[:len(y_true)]
     Z_dense = StandardScaler().fit_transform(Z_dense).astype(np.float32)
 
-    # ---------- Representation C: Conv VAE latents ----------
+    #  Representation C: Conv VAE latents 
     Z_conv = np.load(CONV_Z).astype(np.float32)
     conv_ids = np.load(CONV_IDS).astype(int)
     Z_conv, conv_aligned = align_by_ids(Z_conv, conv_ids, target_ids)
@@ -142,7 +139,7 @@ def main():
     y_conv = pd.factorize(df.loc[mask, "genre"].astype(str))[0]
     Z_conv = StandardScaler().fit_transform(Z_conv).astype(np.float32)
 
-    # ---------- Representation D: Fused audio+lyrics ----------
+    #  Representation D: Fused audio+lyrics 
     X_fused = np.load(FUSED_X).astype(np.float32)
     fused_ids = np.load(FUSED_IDS).astype(int)
     mask = df["track_id"].isin(fused_ids)
@@ -156,7 +153,7 @@ def main():
         ("Fused(ConvVAE+Lyrics)", X_fused, y_fused),
     ]
 
-    # ---------- clustering configs ----------
+    # clustering configs
     k_list = [2,3,4,5,6]
 
     for rep_name, X, y in reps:

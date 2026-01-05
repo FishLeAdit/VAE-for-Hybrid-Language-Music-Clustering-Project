@@ -17,14 +17,6 @@ try:
 except Exception:
     HAS_AUDIOREAD = False
 
-
-# =============================
-# HARD-CODED PATHS (UPDATED)
-# =============================
-# Use the filtered manifest you generated (kept whisper + genius if you want)
-# Pick ONE of these and keep it as MANIFEST:
-#   - data/fma_manifest_5k_5genres_lyrics_whisper_kept_whisper.csv
-#   - data/fma_manifest_5k_5genres_lyrics_whisper_kept_whisper_and_genius.csv
 MANIFEST = "data/fma_manifest_5k_5genres_lyrics_whisper_dropped_removed.csv"
 
 
@@ -33,17 +25,15 @@ OUT_X = "data/audio_features_keptwhisper.npy"
 OUT_IDS = "data/audio_track_ids_keptwhisper.npy"
 OUT_LOG = "data/audio_extract_log_keptwhisper.csv"
 
-# =============================
+
 # FEATURE SETTINGS
-# =============================
 SR = 22050
 DURATION = 30.0
 N_MFCC = 20
 
 
-# =============================
+
 # Helpers
-# =============================
 @contextmanager
 def suppress_stderr():
     old = sys.stderr
@@ -99,9 +89,7 @@ def extract_mfcc(y: np.ndarray) -> np.ndarray:
     return np.concatenate([mfcc.mean(axis=1), mfcc.std(axis=1)]).astype(np.float32)
 
 
-# =============================
 # Main
-# =============================
 def main():
     if not Path(MANIFEST).exists():
         raise SystemExit(f"Manifest not found: {MANIFEST}")

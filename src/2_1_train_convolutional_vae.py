@@ -13,7 +13,6 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 
-# ---------- project import setup ----------
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -21,14 +20,12 @@ if str(ROOT) not in sys.path:
 from src.convolutional_vae_spectrogram import ConvVAE
 from src.spectrogram_utils import audio_to_logmel
 
-
-# ---------- hardcoded paths ----------
 MANIFEST = "data/fma_manifest_5k_5genres_lyrics_whisper_dropped_removed.csv"
 AUDIO_ROOT = Path("data/fma_small/fma_small")
 OUT_Z = "data/audio_latents_convvae.npy"
 OUT_IDS = "data/audio_track_ids_convvae.npy"
 
-# ---------- training config ----------
+# training config   
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 32
 EPOCHS = 50
