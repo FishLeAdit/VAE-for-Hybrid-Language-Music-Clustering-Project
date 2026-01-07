@@ -27,7 +27,8 @@ We compare classical handcrafted audio features with deep representation learnin
 - **Audio format:** MP3
 - **Lyrics source:** Whisper-transcribed text files
 - **Genres:** Multiple high-level genres (used only as proxy labels for evaluation)
-## DATASET LINK: https://github.com/mdeff/fma
+## ORIGINAL DATASET LINK: https://github.com/mdeff/fma
+## PROCESSED DATASET LINK(TEMP.. ONEK JAIGA KHAI):  https://drive.google.com/drive/folders/105WMaBAAJruF2QVqwdq0n50Bz2gzW9kg?usp=sharing
 
 All models are trained in a **fully unsupervised** manner.
 
